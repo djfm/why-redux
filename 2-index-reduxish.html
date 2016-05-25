@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>T&amp;C</title>
+  </head>
+  <body>
+    <div id="mount" />
+    <script>
+      const t = (tagName, attrs = {}, ...children) => {
+        const elt = document.createElement(tagName);
+        for (const key of Object.keys(attrs)) {
+          elt[key] = attrs[key];
+        }
+        [].concat(...children).forEach(child => elt.appendChild(
+          child instanceof Node ? child : document.createTextNode(child)
+        ));
+        return elt;
+      }
+
+      const allChecked =  ({ textsToApprove, approvedTexts }) =>
+        textsToApprove.filter(
+          text => !approvedTexts[text]
+        ).length === 0
+      ;
+
+      const check = text => ({
+        type: 'TOGGLE_CHECKBOX',
+        text
+      });
+
+      const render = (props, dispatch) => {
+        const itemToCheck = text => t('label', {},
+          t('input', {
+            type: 'checkbox',
+            onchange: () => dispatch(check(text)),
+            checked: props.approvedTexts[text]
+          }),
+          text
+        );
+
+        const ui = t('div', {id: 'mount'},
+          props.textsToApprove.map(itemToCheck),
+          t('button', { disabled: !allChecked(props) }, 'Create FREE account!')
+        );
+
+        document.body.replaceChild(ui, document.getElementById('mount'));
+      };
+
+      const checkboxReducer = (state, action) => {
+        const toggle = text => Object.assign(
+          {}, state.approvedTexts, {
+            [text]: !state.approvedTexts[text]
+          }
+        );
+
+        if (action.type === 'TOGGLE_CHECKBOX') {
+          return Object.assign({}, state, {
+            approvedTexts: toggle(action.text)
+          })
+        }
+
+        return state;
+      };
+
+      const initialState = {
+        textsToApprove: [
+          'I agree to the fact that you will own and sell my data.',
+          'I agree to also give you access to data I didn\'t know I had.'
+        ],
+        approvedTexts: {}
+      };
+
+      const createStore = (reducer, initialState) => {
+        let currentState = initialState;
+
+        const dispatch = action => {
+          const newState = reducer(currentState, action);
+          console.log(newState);
+          if (newState !== currentState) {
+            currentState = newState;
+            render(currentState, dispatch);
+          }
+        };
+
+        render(currentState, dispatch);
+
+        return {
+          dispatch,
+        }
+      };
+
+      const store = createStore(checkboxReducer, initialState);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>T&amp;C</title>
+  </head>
+  <body>
+    <div id="mount" />
+    <script>
+      const t = (tagName, attrs = {}, ...children) => {
+        const elt = document.createElement(tagName);
+        for (const key of Object.keys(attrs)) {
+          elt[key] = attrs[key];
+        }
+        [].concat(...children).forEach(child => elt.appendChild(
+          child instanceof Node ? child : document.createTextNode(child)
+        ));
+        return elt;
+      }
+
+      const textsToApprove = [
+        'I agree to the fact that you will own and sell my data.',
+        'I agree to also give you access to data I didn\'t know I had.'
+      ]
+      const approvedTexts = {};
+      const toggleCheckbox = text => {
+        approvedTexts[text] = !approvedTexts[text];
+        render();
+      };
+      const allChecked =  () => textsToApprove.filter(
+        text => !approvedTexts[text]
+      ).length === 0;
+
+      const render = () => {
+        const itemToCheck = text => t('label', {},
+          t('input', {
+            type: 'checkbox',
+            onchange: () => toggleCheckbox(text),
+            checked: approvedTexts[text]
+          }),
+          text
+        );
+
+        const ui = t('div', {id: 'mount'},
+          textsToApprove.map(itemToCheck),
+          t('button', { disabled: !allChecked() }, 'Create FREE account!')
+        );
+
+        document.body.replaceChild(ui, document.getElementById('mount'));
+      };
+
+      render();
+    </script>
+  </body>
+</html>

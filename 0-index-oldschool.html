@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>T&amp;C</title>
+  </head>
+  <body>
+    <label>
+      <input id="standard-terms" type="checkbox">
+      I agree to the fact that you will own and sell my data.
+    </label>
+    <label>
+      <input id="worse-terms" type="checkbox">
+      I agree to also give you access to data I didn't know I had.
+    </label>
+    <button id="continue" disabled>Create FREE account!</button>
+
+    <script>
+      const checkboxIds = ['standard-terms', 'worse-terms'];
+
+      const checkboxStates = {};
+      const toggleCheckbox = id => {
+        checkboxStates[id] = !checkboxStates[id];
+        for (const id of checkboxIds) {
+          if (!checkboxStates[id]) {
+            document.getElementById('continue').setAttribute('disabled', true);
+            return;
+          }
+        }
+        document.getElementById('continue').removeAttribute('disabled');
+      }
+
+      checkboxIds.forEach(id =>
+        document.getElementById(id).addEventListener(
+          'change',
+          () => toggleCheckbox(id)
+        )
+      )
+    </script>
+  </body>
+</html>
