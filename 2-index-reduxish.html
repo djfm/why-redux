@@ -76,7 +76,6 @@
 
         const dispatch = action => {
           const newState = reducer(currentState, action);
-          console.log(newState);
           if (newState !== currentState) {
             currentState = newState;
             render(currentState, dispatch);
